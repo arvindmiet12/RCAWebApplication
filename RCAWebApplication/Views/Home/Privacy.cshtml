@@ -1,0 +1,147 @@
+﻿@{
+    ViewData["Title"] = "Privacy Policy";
+}
+<h1>@ViewData["Title"]</h1>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-select Dropdown with Checkbox</title>
+    <style>
+        body {
+          font-family: Arial, sans-serif;
+          margin: 20px;
+        }
+        .multiselect {
+          position: relative;
+          display: inline-block;
+          width: 250px;
+        }
+        .selectBox {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          border: 1px solid #ccc;
+          padding: 8px;
+          cursor: pointer;
+          border-radius: 5px;
+          background: #fff;
+        }
+        .selectBox:after {
+          content: "▼";
+          font-size: 12px;
+          margin-left: 10px;
+        }
+        .checkboxes {
+          display: none;
+          border: 1px solid #ccc;
+          position: absolute;
+          background: white;
+          width: 100%;
+          max-height: 200px;
+          overflow-y: auto;
+          z-index: 1000;
+          border-radius: 5px;
+        }
+        .checkboxes label {
+          display: block;
+          padding: 5px;
+          cursor: pointer;
+        }
+        .checkboxes label:hover {
+          background-color: #f1f1f1;
+        }
+        .searchBox {
+          padding: 5px;
+          border-bottom: 1px solid #ccc;
+        }
+        .searchBox input {
+          width: 95%;
+          padding: 5px;
+          border: 1px solid #ccc;
+          border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+    <h3>Category</h3>
+    <div class="multiselect">
+        <div class="selectBox" onclick="toggleCheckboxes()">
+            <span id="selectedText">None selected</span>
+        </div>
+        <div class="checkboxes" id="checkboxes">
+            <div class="searchBox">
+                <input type="text" id="searchInput" placeholder="Search..." onkeyup="filterOptions()">
+            </div>
+            <label><input type="checkbox" onclick="selectAll(this)"> Select all</label>
+            <label><input type="checkbox" value="Add New Category" onchange="updateSelected()"> Add New Category</label>
+            <label><input type="checkbox" value="Additional Information Needed" onchange="updateSelected()"> Additional Information Needed</label>
+            <label><input type="checkbox" value="Adjustment" onchange="updateSelected()"> Adjustment</label>
+            <label><input type="checkbox" value="Authorization" onchange="updateSelected()"> Authorization</label>
+            <label><input type="checkbox" value="Billing Errors" onchange="updateSelected()"> Billing Errors</label>
+        </div>
+    </div>
+
+    <script>
+        let expanded = false;
+
+        function toggleCheckboxes() {
+          let checkboxes = document.getElementById("checkboxes");
+          checkboxes.style.display = expanded ? "none" : "block";
+          expanded = !expanded;
+        }
+
+        function updateSelected() {
+            debugger
+          let selected = [];
+          let checkboxes = document.querySelectorAll("#checkboxes input[type=checkbox]:checked");
+          checkboxes.forEach((checkbox) => {
+            if (checkbox.value) {
+              selected.push(checkbox.value);
+            }
+          });
+          document.getElementById("selectedText").innerText =
+            selected.length ? selected.join(", ") : "None selected";
+            if (document.getElementById("selectedText").innerText == "Add New Category") {
+                const name = prompt(`Enter new value`);
+                var type = 'Category';
+                $.post('/RcaAc/AddNew', { type, name });
+            }
+        }
+
+        function selectAll(source) {
+          let checkboxes = document.querySelectorAll("#checkboxes input[type=checkbox]");
+          checkboxes.forEach((checkbox) => {
+            if (checkbox !== source) {
+              checkbox.checked = source.checked;
+            }
+          });
+          updateSelected();
+        }
+
+        function filterOptions() {
+          let input = document.getElementById("searchInput").value.toLowerCase();
+          let labels = document.querySelectorAll("#checkboxes label");
+          labels.forEach((label, index) => {
+            if (index > 0) { // skip "Select all"
+              label.style.display = label.innerText.toLowerCase().includes(input)
+                ? "block"
+                : "none";
+            }
+          });
+        }
+
+        // Close dropdown if clicked outside
+        window.onclick = function(event) {
+          if (!event.target.closest('.multiselect')) {
+            document.getElementById("checkboxes").style.display = "none";
+            expanded = false;
+          }
+        }
+    </script>
+
+</body>
+</html>

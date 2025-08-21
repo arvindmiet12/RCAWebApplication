@@ -1,0 +1,183 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@{
+    ViewData["Title"] = "RCA & AC Setup";
+}
+@* <style>
+    #rcaTable th, #rcaTable td {
+        vertical-align: middle;
+        padding: 10px;
+    }
+
+    #rcaTable th {
+        text-align: center;
+    }
+</style> *@
+
+<div class="container mt-3">
+    <h4>RCA & AC Setup</h4>
+
+    <div class="row g-2 mb-3">
+        <div class="col-md-3">
+            <label>Category</label>
+            <select id="ddlCategory" class="form-select">
+            </select>
+            <button class="btn btn-sm btn-link" onclick="addNew('Category')">+ Add New</button>
+        </div>
+        <div class="col-md-3">
+            <label>Denial</label>
+            <select id="ddlDenial" class="form-select"></select>
+            <button class="btn btn-sm btn-link" onclick="addNew('Denial')">+ Add New</button>
+        </div>
+        <div class="col-md-3">
+            <label>RCA</label>
+            <select id="ddlRca" class="form-select"></select>
+            <button class="btn btn-sm btn-link" onclick="addNew('RCA')">+ Add New</button>
+        </div>
+        <div class="col-md-3">
+            <label>Action Code</label>
+            <select id="ddlAction" class="form-select"></select>
+            <button class="btn btn-sm btn-link" onclick="addNew('ActionCode')">+ Add New</button>
+        </div>
+    </div>
+
+    <button class="btn btn-primary mb-3" id="btnSubmit">Submit</button>
+    <button class="btn btn-secondary mb-3" onclick="resetCancel()">Cancel</button>
+
+    
+</div>
+<div  class ="container-xxl" style="width:1200px;">
+    <button onclick="window.location.href='/RcaAc/ExportToCsv'" class="btn btn-primary mb-3" style="float: right;">Export CSV</button>
+    <table id="tblSetup">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Denial</th>
+                <th>RCA</th>
+                <th>Action Code</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+<script>
+    function loadDropdowns() {
+        $.getJSON('/RcaAc/Dropdowns', d => {
+            fill('#ddlCategory', d.categories);
+            fill('#ddlDenial', d.denials);
+            fill('#ddlRca', d.rcas);
+            fill('#ddlAction', d.actions);
+            // prepend default option once
+            $('#ddlCategory, #ddlDenial, #ddlRca, #ddlAction')
+                .prepend('<option selected>None selected</option>');
+        });
+
+    }
+    function resetCancel() {
+        $.getJSON('/RcaAc/Dropdowns', d => {
+            fill('#ddlCategory', d.categories);
+            fill('#ddlDenial', d.denials);
+            fill('#ddlRca', d.rcas);
+            fill('#ddlAction', d.actions);
+            // prepend default option once
+            $('#ddlCategory, #ddlDenial, #ddlRca, #ddlAction')
+                .prepend('<option selected>None selected</option>');
+        });
+
+    }
+
+
+    function fill(sel, data) {
+        $(sel).empty();
+        data.forEach(x => $(sel).append(`<option value="${x.id}">${x.text}</option>`));
+    }
+
+    function addNew(type) {
+        const name = prompt(`Enter new ${type}:`);
+        if (!name) return;
+        $.post('/RcaAc/AddNew', { type, name }, () => loadDropdowns());
+    }
+ 
+    $('#btnSubmit').click(() => {
+        const dto = {
+            categoryId: $('#ddlCategory').val(),
+            denialId: $('#ddlDenial').val(),
+            rcaId: $('#ddlRca').val(),
+            actionCodeId: $('#ddlAction').val()
+        };
+        $.ajax({
+            url: '/RcaAc/Submit',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(dto)
+        }).done(() => loadTable());
+    });
+
+    function loadTable() {
+        $.getJSON('/RcaAc/List', rows => {
+            const tbody = $('#tblSetup tbody').empty();
+            rows.forEach(r => {
+                tbody.append(`
+                <tr>
+                <td>${r.categoryName}</td>
+                <td>${r.denialText}</td>
+                <td>${r.rcaName}</td>
+                <td>${r.actionCodeName}</td>
+                <td><button type="button" class="btn btn-danger deleteRow" data-id="${r.setupId}">Delete</button></td>
+                </tr>`);
+            });
+        });
+    }
+   
+    // Event delegation in case rows are added dynamically
+    $('#tblSetup').on("click", ".deleteRow", function () {
+        let id = $(this).data("id");  // get the id
+        console.log("Delete ID:", id);
+
+        // Example: remove row from DOM
+        //$(this).closest("tr").remove();
+
+        // Example: call API to delete from backend
+       
+        $.ajax({
+            url: '/RcaAc/Delete/' + id,
+            type: 'DELETE',
+            contentType: 'application/json'
+        }).done(() => loadTable());
+       
+    });
+    
+
+    $('#tblSetup').DataTable({
+        processing: true,   // shows "processing" message
+        serverSide: true,   // enables server-side paging
+        ajax: {
+            url: '/RcaAc/GetPagedData',  // 👈 your .NET Core endpoint
+            type: 'POST'                 // or GET depending on your API
+        },
+        pageLength: 10,
+        //scrollY: "400px",
+        scrollCollapse: true,
+        columns: [
+            { data: 'categoryName' },
+            { data: 'denialText' },
+            { data: 'rcaName' },
+            { data: 'actionCodeName' }
+        ]
+    });
+
+    $(function () {
+        loadDropdowns();
+        loadTable();
+    });
+</script>
