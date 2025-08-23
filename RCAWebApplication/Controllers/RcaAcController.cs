@@ -107,5 +107,49 @@ namespace RCAWebApplication.Controllers
             return BadRequest();
 
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteCatagory(int id)
+        {
+            if (id != null)
+            {
+                var catagorylist = await _rcaAcRepository.DeleteCategoryAsync(id);
+
+                return RedirectToAction("Index");
+            }
+            return BadRequest();
+        }
+        [HttpDelete]
+        public async Task<IActionResult> DeleteDenial(int id)
+        {
+            if (id != null)
+            {
+                var deniallist = await _rcaAcRepository.DeleteDenialAsync(id);
+
+                return RedirectToAction("Index");
+            }
+            return BadRequest();
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteRCA(int id)
+        {
+            if (id != null)
+            {
+                var rcalist = await _rcaAcRepository.DeleteRCAAsync(id);
+
+                return RedirectToAction("Index");
+            }
+            return BadRequest();
+        }
+        public async Task<IActionResult> DeleteAction(int id)
+        {
+            if (id != null)
+            {
+                var ActionCodelist = await _rcaAcRepository.DeleteActionCodeAsync(id);
+                return RedirectToAction("Index");
+            }
+            return BadRequest();
+        }
     }
 }

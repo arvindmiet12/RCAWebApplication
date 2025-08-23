@@ -10,5 +10,10 @@ namespace RCAWebApplication.Repository
         Task<IEnumerable<RcaAcSetupRow>> GetSetupListAsync();
         Task<IEnumerable<Combination>> ExporttoCSVRACSetupListAsync();
         Task<bool> DeleteAsync(int rcaId);
+        Task<bool> DeleteCategoryAsync(int catagoryId);
+        Task<bool> DeleteDenialAsync(int denialId);
+        Task<bool> DeleteRCAAsync(int rcaId);
+        Task<bool> DeleteActionCodeAsync(int actionCode);
+
     }
 }

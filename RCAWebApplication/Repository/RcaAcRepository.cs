@@ -50,6 +50,39 @@ namespace RCAWebApplication.Repository
            );
             return rowsAffected < 0;
         }
+        public async Task<bool> DeleteCategoryAsync(int catagoryId)
+        {
+            using var conn = new SqlConnection(_conn);
+            var rowsAffected = await conn.ExecuteAsync("dbo.sp_DeleteCategory", new { catagoryId = catagoryId },
+               commandType: CommandType.StoredProcedure
+           );
+            return rowsAffected < 0;
+        }
+        public async Task<bool> DeleteDenialAsync(int denialId)
+        {
+            using var conn = new SqlConnection(_conn);
+            var rowsAffected = await conn.ExecuteAsync("dbo.sp_DeleteDenial", new { denialId = denialId },
+               commandType: CommandType.StoredProcedure
+           );
+            return rowsAffected < 0;
+        }
+        public async Task<bool> DeleteRCAAsync(int rcaId)
+        {
+            using var conn = new SqlConnection(_conn);
+            var rowsAffected = await conn.ExecuteAsync("dbo.sp_DeleteRCA", new { rcaId = rcaId },
+               commandType: CommandType.StoredProcedure
+           );
+            return rowsAffected < 0;
+        }
+
+        public async Task<bool> DeleteActionCodeAsync(int actioncode)
+        {
+            using var conn = new SqlConnection(_conn);
+            var rowsAffected = await conn.ExecuteAsync("dbo.sp_DeleteActionCode", new { actioncode = actioncode },
+               commandType: CommandType.StoredProcedure
+           );
+            return rowsAffected < 0;
+        }
 
     }
 }

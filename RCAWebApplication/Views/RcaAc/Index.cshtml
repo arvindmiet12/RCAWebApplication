@@ -26,21 +26,25 @@
             <select id="ddlCategory" class="form-select">
             </select>
             <button class="btn btn-sm btn-link" onclick="addNew('Category')">+ Add New</button>
+            <button class="btn btn-sm btn-link" id="deleteCategory"> Delete Category </button>
         </div>
         <div class="col-md-3">
             <label>Denial</label>
             <select id="ddlDenial" class="form-select"></select>
             <button class="btn btn-sm btn-link" onclick="addNew('Denial')">+ Add New</button>
+            <button class="btn btn-sm btn-link" id="deleteDenial"> Delete Denial </button>
         </div>
         <div class="col-md-3">
             <label>RCA</label>
             <select id="ddlRca" class="form-select"></select>
             <button class="btn btn-sm btn-link" onclick="addNew('RCA')">+ Add New</button>
+            <button class="btn btn-sm btn-link" id="deleteRCA"> Delete RCA </button>
         </div>
         <div class="col-md-3">
             <label>Action Code</label>
             <select id="ddlAction" class="form-select"></select>
             <button class="btn btn-sm btn-link" onclick="addNew('ActionCode')">+ Add New</button>
+            <button class="btn btn-sm btn-link" id="deleteActionCode"> Delete ActionCode </button>
         </div>
     </div>
 
@@ -123,6 +127,63 @@
         }).done(() => loadTable());
     });
 
+
+    $('#deleteCategory').click(() => {
+        debugger
+        var categoryId = $('#ddlCategory').val()
+        if (categoryId == 'None selected') {
+            alert("please select value");
+            return;
+        }
+        $.ajax({
+            url: '/RcaAc/DeleteCatagory/' +categoryId,
+            type: 'DELETE',
+            contentType: 'application/json', 
+            data: categoryId,
+        }).done(() => loadDropdowns());
+    });
+    $('#deleteDenial').click(() => {
+        debugger
+        var denialId = $('#ddlDenial').val()
+        if (denialId == 'None selected') {
+            alert("please select value");
+            return;
+        }
+        $.ajax({
+            url: '/RcaAc/DeleteDenial/' + denialId,
+            type: 'DELETE',
+            contentType: 'application/json',
+            data: denialId,
+        }).done(() => loadDropdowns());
+    });
+    $('#deleteRCA').click(() => {
+        debugger
+        var rcaId = $('#ddlRca').val()
+        if (rcaId == 'None selected') {
+            alert("please select value");
+            return;
+        }
+        $.ajax({
+            url: '/RcaAc/DeleteRCA/' + rcaId,
+            type: 'DELETE',
+            contentType: 'application/json',
+            data: rcaId,
+        }).done(() => loadDropdowns());
+    });
+    $('#deleteActionCode').click(() => {
+        debugger
+        var actionId = $('#ddlAction').val()
+        if (actionId == 'None selected') {
+            alert("please select value");
+            return;
+        }
+        $.ajax({
+            url: '/RcaAc/DeleteAction/' + actionId,
+            type: 'DELETE',
+            contentType: 'application/json',
+            data: actionId,
+        }).done(() => loadDropdowns());
+    });
     function loadTable() {
         $.getJSON('/RcaAc/List', rows => {
             const tbody = $('#tblSetup tbody').empty();
